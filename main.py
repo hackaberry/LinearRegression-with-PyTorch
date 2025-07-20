@@ -52,7 +52,7 @@ def training_loop(model,next_n_epochs):
 	model.eval()
 	with torch.inference_mode():
 		testing_predictions = model(x_test) # Make inferences
-		plot_data(x_train,y_train,x_test,y_test,epoch_count,loss_count,testing_predictions)
+		plot_data(x_train,y_train,x_test,y_test,epoch_count,loss_count,testing_predictions.cpu())
 
 	# Update learned parameters on GUI
 	predicted_parameters.config(text=f"Predicted Weight: {model.state_dict()['layer.weight'][0][0].item():.2f}\n"
@@ -73,16 +73,19 @@ start = 0
 finish = 1
 step = 0.02
 
+device = "cuda" if torch.cuda.is_available() else "cpu" # Device agnostic
+
 X = torch.arange(start,finish,step).unsqueeze(1) # Linear layer requires 2D tensor (batch_size,data)
 y = weight * X + bias
 
 data_split = int(len(X) * 0.8) # 80/20 split of dataset
 
-x_train, y_train = X[:data_split], y[:data_split]
-x_test, y_test = X[data_split:], y[data_split:]
+x_train, y_train = X[:data_split].to(device=device), y[:data_split].to(device=device)
+x_test, y_test = X[data_split:].to(device=device), y[data_split:].to(device=device)
 
 
 model = LinearRegressionModel()
+model.to(device)
 
 # Create the GUI window
 root = tk.Tk()
@@ -100,7 +103,6 @@ learning_graph.scatter(x_train,y_train, c="0.8", label="Training Data")
 learning_graph.scatter(x_test,y_test, c="0", label="Testing Data")
 canvas.get_tk_widget().pack()
 learning_graph.legend()
-loss_graph.legend()
 canvas.draw()
 learning_graph.set_xlabel("X")
 learning_graph.set_ylabel("y")
