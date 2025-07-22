@@ -13,9 +13,9 @@ This project demonstrates a simple linear regression neural network built using 
 ## Installation
 
 1. Clone the repo:
-   ```bash
+```bash
 git clone https://github.com/hackaberry/LinearRegression-with-PyTorch.git
-   ```
+```
 2. Install dependencies:
 ```bash
 pip install torch matplotlib tk
